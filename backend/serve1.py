@@ -1,8 +1,4 @@
-"""An example that shows how to use the API handler directly.
 
-For this to work with RemoteClient, the routes must match those expected
-by the client; i.e., /invoke, /batch, /stream, etc. No trailing slashes should be used.
-"""
 from importlib import metadata
 from typing import List
 
