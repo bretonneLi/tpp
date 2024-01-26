@@ -1,11 +1,10 @@
 
 from importlib import metadata
 from typing import List
+import os 
 
 
-
-
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, UploadFile,File
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import LlamaCppEmbeddings
@@ -41,8 +40,19 @@ async def get_upload_file(files: List[UploadFile]):
     }
 
 @app.post("/pdf_retriever")
-async def get_retriever(file:UploadFile):
-    loader =  PyPDFLoader(file.filename)
+async def get_retriever(file:UploadFile=File(...)):
+    #保存上传文件
+    save_path=f'./pdf_retriever'
+    if not os.path.exists(save_path):
+        os.mkdir(save_path)
+
+    save_file=os.path.join(save_path,file.filename)
+    f=open(save_file,'wb')
+    data = await file.read()
+    f.write(data)
+    f.close()
+
+    loader =  PyPDFLoader(f"/home/dubenhao/pdf_retriever/{file.filename}")
     data=loader.load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
     splits = text_splitter.split_documents(data)
