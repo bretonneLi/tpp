@@ -1,4 +1,3 @@
-
 from importlib import metadata
 from typing import List
 import os 
@@ -50,7 +49,7 @@ async def get_retriever(file:UploadFile=File(...),embedding_id:int=None, user_na
     user_info={"User name":user_name, "Embedding_ID":embedding_id,"time":time.ctime()}#Information updated
     #Save the upload file
     
-    save_path="/home/dubenhao/pdf_retriever"
+    save_path="/home/dubenhao/pdf_retriever" # custom path
     if not os.path.exists(save_path):
         os.mkdir(save_path)
 
@@ -63,9 +62,9 @@ async def get_retriever(file:UploadFile=File(...),embedding_id:int=None, user_na
         f.write(data)
         f.close()
         
+        filestore_path=f"/home/dubenhao/pdf_retriever/{file.filename}"
 
-
-        loader =  PyPDFLoader(f"/home/dubenhao/pdf_retriever/{file.filename}")
+        loader =  PyPDFLoader(filestore_path)
         data=loader.load()
         data[0].metadata.update(user_info) #根据上传的客户信息更改METADATA信息
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
@@ -96,16 +95,20 @@ async def get_retriever(file:UploadFile=File(...),embedding_id:int=None, user_na
 @app.delete("/pdf_retriever/{filename}")
 async def delete_file(filename:str):
     #删除储存的向量数据
-    if os.path.exists(f"/home/dubenhao/vectorstore/{filename}"):
-        vectorstore=FAISS.load_local(f"/home/dubenhao/vectorstore/{filename}",embeddings=LlamaCppEmbeddings(model_path="/home/dubenhao/llama/llama-2-7b-chat/ggml-model-q4_k_m.gguf"))
+    vectorstore_path=f"/home/dubenhao/vectorstore/{filename}"#path
+
+    if os.path.exists(vectorstore_path):
+        vectorstore=FAISS.load_local(vectorstore_path,embeddings=LlamaCppEmbeddings(model_path=model_path))
         for id in vectorstore.index_to_docstore_id:
             vectorstore.delete([vectorstore.index_to_docstore_id[0]])
-        os.remove(f"/home/dubenhao/vectorstore/{filename}/index.faiss")
-        os.remove(f"/home/dubenhao/vectorstore/{filename}/index.pkl")
-        os.rmdir(f"/home/dubenhao/vectorstore/{filename}")
+        os.remove(vectorstore_path.join("/index.faiss"))
+        os.remove(vectorstore_path.join("/index.pkl"))
+        os.rmdir(vectorstore_path)
     #删除储存的文件
-    if os.path.exists(f"/home/dubenhao/pdf_retriever/{filename}"):
-        os.remove(f"/home/dubenhao/pdf_retriever/{filename}")
+    filestore_path=f"/home/dubenhao/pdf_retriever/{filename}"# path
+
+    if os.path.exists(filestore_path):
+        os.remove(filestore_path)
     
 
     return {"delete":filename,"vector_id":vectorstore.index_to_docstore_id}
