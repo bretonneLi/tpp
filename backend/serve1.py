@@ -30,7 +30,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 #llm model path
-model_path="/home/dubenhao/llama/llama-2-7b-chat/ggml-model-q4_k_m.gguf"
+main_path="/home/dubenhao"
+model_path=main_path.join("/llama/llama-2-7b-chat/ggml-model-q4_k_m.gguf")
 
 @app.post("/uploadfile/")
 async def get_upload_file(files: List[UploadFile]):
@@ -43,7 +44,7 @@ async def get_upload_file(files: List[UploadFile]):
 
 @app.post("/pdf_retriever")
 async def get_retriever(file:UploadFile=File(...),embedding_id:int=None, user_name:str=None,):
-    vectorstore_path=f"/home/dubenhao/vectorstore/{file.filename}"
+    vectorstore_path=main_path.join(f"/vectorstore/{file.filename}")
     
 
     user_info={"User name":user_name, "Embedding_ID":embedding_id,"time":time.ctime()}#Information updated
@@ -62,7 +63,7 @@ async def get_retriever(file:UploadFile=File(...),embedding_id:int=None, user_na
         f.write(data)
         f.close()
         
-        filestore_path=f"/home/dubenhao/pdf_retriever/{file.filename}"
+        filestore_path=main_path.join(f"/pdf_retriever/{file.filename}")
 
         loader =  PyPDFLoader(filestore_path)
         data=loader.load()
@@ -95,7 +96,7 @@ async def get_retriever(file:UploadFile=File(...),embedding_id:int=None, user_na
 @app.delete("/pdf_retriever/{filename}")
 async def delete_file(filename:str):
     #删除储存的向量数据
-    vectorstore_path=f"/home/dubenhao/vectorstore/{filename}"#path
+    vectorstore_path=main_path.join(f"/vectorstore/{filename}")#path
 
     if os.path.exists(vectorstore_path):
         vectorstore=FAISS.load_local(vectorstore_path,embeddings=LlamaCppEmbeddings(model_path=model_path))
@@ -105,7 +106,7 @@ async def delete_file(filename:str):
         os.remove(vectorstore_path.join("/index.pkl"))
         os.rmdir(vectorstore_path)
     #删除储存的文件
-    filestore_path=f"/home/dubenhao/pdf_retriever/{filename}"# path
+    filestore_path=main_path.join(f"/pdf_retriever/{filename}")# path
 
     if os.path.exists(filestore_path):
         os.remove(filestore_path)
