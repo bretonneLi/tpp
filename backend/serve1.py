@@ -30,7 +30,8 @@ app.add_middleware(
     # 当然 Accept、Accept-Language、Content-Language 以及 Content-Type 总之被允许的
     allow_headers=["*"],
 )
-
+#llm model path
+model_path="/home/dubenhao/llama/llama-2-7b-chat/ggml-model-q4_k_m.gguf"
 
 @app.post("/uploadfile/")
 async def get_upload_file(files: List[UploadFile]):
@@ -38,11 +39,16 @@ async def get_upload_file(files: List[UploadFile]):
     return {
         "names":[file.filename for file in files]
     }
-from pypdf import PdfReader, PdfWriter
+
+
+
 @app.post("/pdf_retriever")
 async def get_retriever(file:UploadFile=File(...),embedding_id:int=None, user_name:str=None,):
-    user_info={"User name":user_name, "Embedding_ID":embedding_id,"time":time.ctime()}#用户上传信息
-    #保存上传文件
+    vectorstore_path=f"/home/dubenhao/vectorstore/{file.filename}"
+    
+
+    user_info={"User name":user_name, "Embedding_ID":embedding_id,"time":time.ctime()}#Information updated
+    #Save the upload file
     
     save_path="/home/dubenhao/pdf_retriever"
     if not os.path.exists(save_path):
@@ -64,25 +70,28 @@ async def get_retriever(file:UploadFile=File(...),embedding_id:int=None, user_na
         data[0].metadata.update(user_info) #根据上传的客户信息更改METADATA信息
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
         splits = text_splitter.split_documents(data)
-       
+
+        #
+
         vectorstore = FAISS.from_documents(documents=splits, 
-                                           embedding=LlamaCppEmbeddings(model_path="/home/dubenhao/llama/llama-2-7b-chat/ggml-model-q4_k_m.gguf"))
-        vectorstore.save_local(f"/home/dubenhao/vectorstore/{file.filename}")
+                                           embedding=LlamaCppEmbeddings(model_path=model_path))
+        vectorstore.save_local(vectorstore_path)
     #file_upload_time=time.ctime()
     else:
-        vectorstore=FAISS.load_local(f"/home/dubenhao/vectorstore/{file.filename}",embeddings=LlamaCppEmbeddings(model_path="/home/dubenhao/llama/llama-2-7b-chat/ggml-model-q4_k_m.gguf"))
+        vectorstore=FAISS.load_local(vectorstore_path,embeddings=LlamaCppEmbeddings(model_path=model_path))
 
     return  {
                 "file_name": file.filename,
                 "file_size":file.size,#bytes
                 "vector_id":vectorstore.index_to_docstore_id,
-                "vector_path":f"/home/dubenhao/vectorstore/{file.filename}",
+                "vector_path":vectorstore_path,
                 "metadata":data[0].metadata,
                 #"file_upload_time":file_upload_time,
                 #emb_id
                 #owner
                 #file_status
             }
+
 
 @app.delete("/pdf_retriever/{filename}")
 async def delete_file(filename:str):
