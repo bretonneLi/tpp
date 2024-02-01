@@ -50,7 +50,7 @@ async def get_retriever(file:UploadFile=File(...),embedding_id:int=None, user_na
     user_info={"User name":user_name, "Embedding_ID":embedding_id,"time":time.ctime()}#Information updated
     #Save the upload file
     
-    save_path="/home/dubenhao/pdf_retriever" # custom path
+    save_path=main_path.join("/pdf_retriever") # custom path
     if not os.path.exists(save_path):
         os.mkdir(save_path)
 
