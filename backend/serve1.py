@@ -41,7 +41,7 @@ async def get_upload_file(files: List[UploadFile]):
 from pypdf import PdfReader, PdfWriter
 @app.post("/pdf_retriever")
 async def get_retriever(file:UploadFile=File(...),embedding_id:int=None, user_name:str=None,):
-    user_info={"/User name":user_name, "/Embedding_ID":embedding_id,"/time":time.ctime()}#用户上传信息
+    user_info={"User name":user_name, "Embedding_ID":embedding_id,"time":time.ctime()}#用户上传信息
     #保存上传文件
     
     save_path="/home/dubenhao/pdf_retriever"
@@ -51,25 +51,17 @@ async def get_retriever(file:UploadFile=File(...),embedding_id:int=None, user_na
     save_path_path=save_path.join("/")
     #Embedding 
     if not os.path.exists(save_path_path.join(file.filename)):
-#        save_file=os.path.join(save_path,file.filename)
-#        f=open(save_file,'wb')
-#        data = await file.read()
-#        f.write(data)
-#        f.close()
+        save_file=os.path.join(save_path,file.filename)
+        f=open(save_file,'wb')
+        data = await file.read()
+        f.write(data)
+        f.close()
         
-        #修改metadata
-        reader = PdfReader(file.filename)
-        writer = PdfWriter() 
-        for page in reader.pages:
-            writer.add_page(page)
-        writer.add_metadata(reader.metadata)
-        writer.add_metadata(user_info)
-        with open(f"/home/dubenhao/pdf_retriever/{file.filename}", "wb") as f:
-            writer.write(f)
+
 
         loader =  PyPDFLoader(f"/home/dubenhao/pdf_retriever/{file.filename}")
         data=loader.load()
-        #data[0].metadata.update(user_info) #根据上传的客户信息更改METADATA信息
+        data[0].metadata.update(user_info) #根据上传的客户信息更改METADATA信息
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
         splits = text_splitter.split_documents(data)
        
@@ -85,7 +77,7 @@ async def get_retriever(file:UploadFile=File(...),embedding_id:int=None, user_na
                 "file_size":file.size,#bytes
                 "vector_id":vectorstore.index_to_docstore_id,
                 "vector_path":f"/home/dubenhao/vectorstore/{file.filename}",
-                "metadata":PdfReader(f"/home/dubenhao/pdf_retriever/{file.filename}").metadata,
+                "metadata":data[0].metadata,
                 #"file_upload_time":file_upload_time,
                 #emb_id
                 #owner
