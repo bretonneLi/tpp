@@ -1,8 +1,7 @@
-
 from importlib import metadata
 from typing import List
 import os 
-
+from datetime import date
 
 from fastapi import FastAPI, UploadFile,File
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -10,8 +9,11 @@ from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import LlamaCppEmbeddings
 from langchain_community.document_loaders import PyPDFLoader
 from fastapi.middleware.cors import CORSMiddleware #解决跨域问题
+from pydantic import BaseModel#Request Body
+'''
 PYDANTIC_VERSION = metadata.version("pydantic")
 _PYDANTIC_MAJOR_VERSION: int = int(PYDANTIC_VERSION.split(".")[0])
+'''
 
 app = FastAPI(
     title="LangChain Server",
@@ -30,6 +32,10 @@ app.add_middleware(
     # 当然 Accept、Accept-Language、Content-Language 以及 Content-Type 总之被允许的
     allow_headers=["*"],
 )
+#llm model path
+main_path="/home/dubenhao"
+model_path=main_path+("/llama/llama-2-7b-chat/ggml-model-q4_k_m.gguf")
+
 
 
 @app.post("/uploadfile/")
@@ -39,30 +45,87 @@ async def get_upload_file(files: List[UploadFile]):
         "names":[file.filename for file in files]
     }
 
+class file_info(BaseModel):
+    owner:str
+    embedding_id:int
+    uploaded_time:date
+
 @app.post("/pdf_retriever")
-async def get_retriever(file:UploadFile=File(...)):
-    #保存上传文件
-    save_path=f'./pdf_retriever'
+async def get_retriever(file:UploadFile,uploaded_time:date,embedding_id:int,owner:str):#fileinfo:file_info, 
+    vectorstore_path=main_path+f"/vectorstore/{file.filename}"
+    
+
+    user_info={"User name":owner, "Embedding_ID":embedding_id,"uploaded_time":uploaded_time}#Information updated
+    #Save the upload file
+    
+    save_path=main_path+"/pdf_retriever" # custom path
     if not os.path.exists(save_path):
         os.mkdir(save_path)
 
-    save_file=os.path.join(save_path,file.filename)
-    f=open(save_file,'wb')
-    data = await file.read()
-    f.write(data)
-    f.close()
+    #save_path_path=save_path+("/")
+    #Embedding 
+    if not os.path.exists(save_path+"/"+(file.filename)):
+        save_file=os.path.join(save_path,file.filename)
+        f=open(save_file,'wb')
+        data = await file.read()
+        f.write(data)
+        f.close()
+        
+        filestore_path=main_path+f"/pdf_retriever/{file.filename}"
 
-    loader =  PyPDFLoader(f"/home/dubenhao/pdf_retriever/{file.filename}")
-    data=loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
-    splits = text_splitter.split_documents(data)
-    vectorstore = FAISS.from_documents(documents=splits, embedding=LlamaCppEmbeddings(model_path="/home/dubenhao/llama/llama-2-7b-chat/ggml-model-q4_k_m.gguf"))
-    vectorstore.save_local("/home/dubenhao/vectorstore/db_faiss_serve")
+        loader =  PyPDFLoader(filestore_path)
+        data=loader.load()
+        data[0].metadata.update(user_info) #根据上传的客户信息更改METADATA信息
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
+        splits = text_splitter.split_documents(data)
+
+        #
+
+        vectorstore = FAISS.from_documents(documents=splits, 
+                                           embedding=LlamaCppEmbeddings(model_path=model_path))
+        vectorstore.save_local(vectorstore_path)
+    #file_upload_time=time.ctime()
+    else:
+        filestore_path=main_path+f"/pdf_retriever/{file.filename}"
+        loader =  PyPDFLoader(filestore_path)
+        data=loader.load()
+        data[0].metadata.update(user_info)
+        vectorstore=FAISS.load_local(vectorstore_path,embeddings=LlamaCppEmbeddings(model_path=model_path))
+
+    return  {
+                "file_name": file.filename,
+                "file_size":file.size,#bytes
+                "vector_id":vectorstore.index_to_docstore_id,
+                "vector_path":vectorstore_path,
+                "metadata":data[0].metadata,
+                "file_uploaded_time":uploaded_time,
+                "embedding_id":embedding_id,
+                "owner":owner,
+                #
+                #
+                #file_status
+            }
+
+@app.delete("/pdf_retriever/{filename}")
+async def delete_file(filename:str):
+    #删除储存的向量数据
+    vectorstore_path=main_path+f"/vectorstore/{filename}"#path
+
+    if os.path.exists(vectorstore_path):
+        vectorstore=FAISS.load_local(vectorstore_path,embeddings=LlamaCppEmbeddings(model_path=model_path))
+        for id in vectorstore.index_to_docstore_id:
+            vectorstore.delete([vectorstore.index_to_docstore_id[0]])
+        os.remove(vectorstore_path+("/index.faiss"))
+        os.remove(vectorstore_path+("/index.pkl"))
+        os.rmdir(vectorstore_path)
+    #删除储存的文件
+    filestore_path=main_path+f"/pdf_retriever/{filename}"# path
+
+    if os.path.exists(filestore_path):
+        os.remove(filestore_path)
     
-    return vectorstore.index_to_docstore_id
 
-
-
+    return {"delete":filename,"vector_id":vectorstore.index_to_docstore_id}
 
 
 if __name__ == "__main__":
