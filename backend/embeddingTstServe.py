@@ -29,8 +29,8 @@ app.add_middleware(
 
 # emb_id, owner, uploaded_time
 @app.post("/mockuploadfile/")
-async def create_upload_file(file: UploadFile, owner:str=Form(...),uploaded_time:str=Form(...),emb_fild_id:str=Form(...)):
-    return {"file_name": file.filename, "owner": owner, 'emb_file_id': emb_fild_id}
+async def create_upload_file(file: UploadFile, owner:str=Form(...),uploadedTime:str=Form(...),embId:str=Form(...)):
+    return {"file_name": file.filename, "owner": owner, 'embId': embId}
 
 
 if __name__ == "__main__":

@@ -6,8 +6,12 @@ export function uploadFile(url, file, recordId){
     let formData = new FormData(); 
     formData.append('file', file); 
     formData.append('owner', 'admin');
-    formData.append('uploaded_time', '2024-01-01 10:00:00')
-    formData.append('emb_fild_id', recordId);
+    // get current time
+    let currentTime = new Date(); // 创建一个表示当前时间的Date对象
+    // 格式化为指定的字符串形式（yyyy-MM-dd HH:mm:ss）
+    let formattedTime = currentTime.getFullYear() + '-' + (currentTime.getMonth()+1).toString().padStart(2, '0') + '-' + currentTime.getDate().toString().padStart(2, '0');
+    formData.append('uploadedTime', formattedTime);
+    formData.append('embId', recordId);
     return axios.post('http://localhost:8000'+url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data' 

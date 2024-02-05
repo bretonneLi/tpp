@@ -6,8 +6,26 @@ function PandaTable(props) {
     const getRecords= props.getRecords;
     // console.log(items);
 
-    const deleteEmbedding =()=>{
+    const deleteEmbedding =(item)=>{
         // TODO
+        console.log('start to remove emb_id: '+item.emb_id);
+        let params ={
+            'embId': item.emb_id,
+            'fileStatus': 'Deleted'
+        };
+
+        if(window.confirm('Are you sure you want to delete this record?')){
+            updateEmbeddingRecord(params).then((response)=>{
+                console.log('removed '+response.data);
+                // request backend to remove datas in Vector databse
+                // TODO
+    
+                // refresh list after remove is done
+                getRecords();
+            }).catch((error)=>{
+                console.log('remove error: '+error);
+            });
+        }        
     }
 
     const chatWithLLM =() =>{
@@ -33,7 +51,7 @@ function PandaTable(props) {
                 <td className='table-first-col'>
                     <strong>{item.file_name}</strong>
                     <div className='table-col-ops'>
-                       <span><a onClick={deleteEmbedding}>Delete</a> | </span> 
+                       <span><a onClick={() => deleteEmbedding(item)}>Delete</a> | </span> 
                        <span> <a onClick={chatWithLLM}>Chat</a></span>
                     </div>    
                 </td>

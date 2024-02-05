@@ -93,7 +93,7 @@ function add_embedding_record(WP_REST_Request $request) {
     $table_name = $wpdb->prefix . 'embedding_records';
     $parameters = json_decode($request->get_body());
     $fileName = $parameters->fileName;
-    $fileStatus = 'in-progress';
+    $fileStatus = 'In-progress';
     $fileSize = $parameters->fileSize;
 
     if($fileName) {
