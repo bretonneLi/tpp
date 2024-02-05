@@ -33,6 +33,7 @@ export function updateEmbeddingRecord(data){
    })
  }
 
+ // load all embedding records
 export function getEmbeddingRecords(){
   return Request({
     url:"/embedding/v1/list",

@@ -44,7 +44,7 @@ function Panda(){
             </div>): null
             }
             <div className='panda-list'>
-                <PandaTable items={items} />
+                <PandaTable items={items} getRecords={getRecords}/>
             </div>
         </div>
     );

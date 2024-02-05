@@ -1,11 +1,17 @@
 import './pandaTable.css';
+import {updateEmbeddingRecord} from '../api/embedding';
 
 function PandaTable(props) {
-    const{items} = props;
+    const items = props.items;
+    const getRecords= props.getRecords;
     // console.log(items);
 
-    const deleteEmbedding =() =>{
+    const deleteEmbedding =()=>{
         // TODO
+    }
+
+    const chatWithLLM =() =>{
+        // TODO redirect to chat page with LLM
 
     }
 
@@ -28,7 +34,7 @@ function PandaTable(props) {
                     <strong>{item.file_name}</strong>
                     <div className='table-col-ops'>
                        <span><a onClick={deleteEmbedding}>Delete</a> | </span> 
-                       <span> <a onClick={deleteEmbedding}>Talk</a></span>
+                       <span> <a onClick={chatWithLLM}>Chat</a></span>
                     </div>    
                 </td>
                 <td className='table-col blue-color'>{item.owner}</td>
