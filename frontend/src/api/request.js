@@ -1,7 +1,7 @@
 import aioxs from 'axios';
 
 const Request = aioxs.create({
-    baseURL: "http://localhost:8088/",
+    baseURL: "http://localhost:8089/wordpress/?rest_route=",
     timeout: 5000
 });
 
@@ -14,8 +14,7 @@ Request.interceptors.request.use((config) => {
     return Promise.reject(error)
 }
 )
- 
- 
+
  
 // response interceptor
 Request.interceptors.response.use((response) => {

@@ -3,7 +3,7 @@ from typing import List
 
 from fastapi.middleware.cors import CORSMiddleware #解决跨域问题
 
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI,Form, UploadFile
 
 PYDANTIC_VERSION = metadata.version("pydantic")
 _PYDANTIC_MAJOR_VERSION: int = int(PYDANTIC_VERSION.split(".")[0])
@@ -27,9 +27,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# emb_id, owner, uploaded_time
 @app.post("/mockuploadfile/")
-async def create_upload_file(file: UploadFile):
-    return {"filename": file.filename}
+async def create_upload_file(file: UploadFile, owner:str=Form(...),uploaded_time:str=Form(...),emb_fild_id:str=Form(...)):
+    return {"file_name": file.filename, "owner": owner, 'emb_file_id': emb_fild_id}
 
 
 if __name__ == "__main__":

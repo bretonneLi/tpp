@@ -1,9 +1,12 @@
-import React,{useMemo} from 'react';
+import React,{useMemo, useState} from 'react';
 import {useDropzone} from 'react-dropzone';
 import './uploader.css';
 import '../Panda.css';
-import {uploadFile} from '../api/embedding'
+import {uploadFile,addEmbeddingRecord,updateEmbeddingRecord} from '../api/embedding'
+
 function Uploader(props) {
+  const {getRecords} = props;
+  const [resMsg, setResMsg] = useState('uploaded OK.');
     const baseStyle = {
         flex: 1,
         display: 'flex',
@@ -32,17 +35,60 @@ function Uploader(props) {
         borderColor: '#ff1744'
       };
 
-    // send uploaded file to server side with requesting web api
-    const onDrop = (acceptedFiles)=>{
-      console.log('start...')
-      let request = uploadFile("/mockuploadfile/", acceptedFiles[0]);
+    const updateEmbedding=(params)=>{
+      // update file status and vector ids
+      updateEmbeddingRecord(params).then((response)=>{
+        // console.log("updated "+response.data);
+         // refresh table list
+        getRecords();
+      }).catch((error)=>{
+        console.log("updated eror : "+error);
+      });
+    }
+      
+    const uploadEmbedding = (file, embId) => {
+      let request = uploadFile("/mockuploadfile/", file, embId);
       request.then((response)=>{
         // file sent successfully
         console.log(response.status);
         console.log(response.data);
+        if(response){
+          // get embedding response ok
+          let params = {
+            'embId': embId,
+            'fileStatus': 'Uploaded',
+            'vectorIds': JSON.stringify(response)
+          };
+          // update file status and vector ids
+          updateEmbedding(params);
+        }       
       }).catch((error)=>{
         console.log('file sent failed .', error);
+        setResMsg('File uploading failed.');
       });
+    };
+
+    // send uploaded file to server side with requesting web api
+    const onDrop = (acceptedFiles)=>{
+      console.log('start...')
+      let uploadedFile = acceptedFiles[0];
+      let params = {
+        'fileName': uploadedFile.path,
+        'fileSize': (uploadedFile.size / 1000).toFixed(1),
+      }
+      // start to save data to wp data table
+      addEmbeddingRecord(params).then((response)=>{
+        // console.log(response);
+        if(response.data>0){
+          // get right embedding file id, then send file to backend for embedding processing
+          uploadEmbedding(uploadedFile, response.data);
+        }else{
+          setResMsg('File record save failed.');
+        }
+      }).catch((error)=>{
+        setResMsg('File record save failed.');
+        console.log('embedding record save failed');
+      })
     };
 
     const {
@@ -74,7 +120,7 @@ function Uploader(props) {
 
     const files = acceptedFiles.map(file => (
       <li key={file.path}>
-        {file.path} - {file.size} bytes
+        {file.path} - {file.size} bytes -- {resMsg?(<em>{resMsg}</em>):null}
       </li>
     ));
 

@@ -1,0 +1,91 @@
+.panda-table{
+    table-layout: fixed;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    border-spacing: 0;
+    width: 100%;
+    clear: both;
+    margin: 0;
+    display: table;
+    border-collapse: separate;
+    box-sizing: border-box;
+    text-indent: initial;
+    word-wrap: break-word;
+}
+
+.panda-table th{
+    line-height: 36.4px;
+    padding: 0 8px;
+    color: #2c3338;
+    border-bottom: 1px solid #c3c4c7;
+    font-weight: 400;
+    text-align: left;
+    font-size: 14px;
+}
+.panda-table td{
+    display: table-cell;
+    padding-bottom: 15px;
+}
+.panda-table th.ten-cent{
+    width:10%;
+    padding:8px 10px;
+}
+
+.panda-table tbody{
+    word-wrap: break-word;
+    display: table-row-group;
+    vertical-align: middle;
+    border-color: inherit;
+}
+
+.panda-table tbody tr{
+    line-height: 29.8px;
+    
+}
+
+.panda-table tbody tr strong{
+    display: block;
+    margin-bottom: 2.8px;
+    font-size: 13px;
+}
+
+.panda-table tbody>:nth-child(odd){
+    background-color: #f6f7f7;
+}
+
+.table-col{
+    font-size: 13px;
+    vertical-align: top;
+    padding: 8px 10px;
+    word-wrap: break-word;
+}
+
+.table-first-col{
+    padding-left: 8px;
+    vertical-align: top;
+    position: relative;
+}
+
+.table-first-col:hover .table-col-ops{
+    display: block;
+}
+
+.table-col-ops{
+    display: none;
+    position: absolute;
+    bottom: 10px;
+    height: 20px;
+    left: 10px;
+}
+
+.table-col-ops a{
+    cursor: pointer;
+    font-size: 13px;
+    color: #2271b1;
+    outline: 0;
+}
+
+.blue-color{
+    color: #2271b1;
+}
