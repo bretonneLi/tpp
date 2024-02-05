@@ -9,7 +9,13 @@ export function uploadFile(url, file, recordId){
     // get current time
     let currentTime = new Date(); // 创建一个表示当前时间的Date对象
     // 格式化为指定的字符串形式（yyyy-MM-dd HH:mm:ss）
-    let formattedTime = currentTime.getFullYear() + '-' + (currentTime.getMonth()+1).toString().padStart(2, '0') + '-' + currentTime.getDate().toString().padStart(2, '0');
+    let formattedTime = currentTime.getFullYear() + '-' 
+    + (currentTime.getMonth()+1).toString().padStart(2, '0') + '-' 
+    + currentTime.getDate().toString().padStart(2, '0')+ ' '
+    + currentTime.getHours().toString().padStart(2, '0')+':'
+    + currentTime.getMinutes().toString().padStart(2, '0')+':'
+    + currentTime.getSeconds().toString().padStart(2, '0');
+    
     formData.append('uploadedTime', formattedTime);
     formData.append('embId', recordId);
     return axios.post('http://localhost:8000'+url, formData, {
