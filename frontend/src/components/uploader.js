@@ -57,7 +57,7 @@ function Uploader(props) {
           let params = {
             'embId': embId,
             'fileStatus': 'Uploaded',
-            'vectorIds': JSON.stringify(response)
+            'vectorIds': JSON.stringify(response.data)
           };
           // update file status and vector ids
           updateEmbedding(params);
