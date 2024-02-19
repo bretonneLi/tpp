@@ -1,5 +1,5 @@
 from importlib import metadata
-from typing import List
+from typing import Any, Dict, List, Union
 import os 
 from datetime import date
 
@@ -10,6 +10,11 @@ from langchain_community.embeddings import LlamaCppEmbeddings
 from langchain_community.document_loaders import PyPDFLoader
 from fastapi.middleware.cors import CORSMiddleware #解决跨域问题
 from pydantic import BaseModel#Request Body
+
+from langchain.llms import LlamaCpp
+from langchain.prompts import PromptTemplate
+from langchain.chains import RetrievalQA
+from langserve import add_routes
 '''
 PYDANTIC_VERSION = metadata.version("pydantic")
 _PYDANTIC_MAJOR_VERSION: int = int(PYDANTIC_VERSION.split(".")[0])
@@ -36,8 +41,25 @@ app.add_middleware(
 main_path="/home/dubenhao"
 model_path=main_path+("/llama/llama-2-7b-chat/ggml-model-q4_k_m.gguf")
 
+llm = LlamaCpp(
+    model_path=model_path,
+    max_tokens=2048,
+    n_gpu_layers=1,
+    n_batch=512,
+    n_ctx=2048,
+    f16_kv=True,
 
-
+)
+template="""[INST]
+    Use the following pieces ofcontext to answer the question.If no context provided, answer like a AI assistant. 
+    
+    {context} 
+    Question: {question}
+    [/INST]
+"""
+@app.get("/")
+def home():
+    return {"homepage":"hello, this is a chatbot API build with Llama2-chat-7B and Langchain"}
 @app.post("/uploadfile/")
 async def get_upload_file(files: List[UploadFile]):
 
@@ -45,17 +67,12 @@ async def get_upload_file(files: List[UploadFile]):
         "names":[file.filename for file in files]
     }
 
-class file_info(BaseModel):
-    owner:str
-    embedding_id:int
-    uploaded_time:date
-
-@app.post("/pdf_retriever")
-async def get_retriever(file:UploadFile,uploaded_time:date,embedding_id:int,owner:str):#fileinfo:file_info, 
+@app.post("/pdf_retriever",tags=["上传文件接口, API for upload pdf file,"])
+async def get_retriever(file:UploadFile):#fileinfo:file_info, ,uploaded_time:date,embedding_id:int,owner:str
     vectorstore_path=main_path+f"/vectorstore/{file.filename}"
     
 
-    user_info={"User name":owner, "Embedding_ID":embedding_id,"uploaded_time":uploaded_time}#Information updated
+    #user_info={"User name":owner, "Embedding_ID":embedding_id,"uploaded_time":uploaded_time}#Information updated
     #Save the upload file
     
     save_path=main_path+"/pdf_retriever" # custom path
@@ -75,7 +92,7 @@ async def get_retriever(file:UploadFile,uploaded_time:date,embedding_id:int,owne
 
         loader =  PyPDFLoader(filestore_path)
         data=loader.load()
-        data[0].metadata.update(user_info) #根据上传的客户信息更改METADATA信息
+        #data[0].metadata.update(user_info) #根据上传的客户信息更改METADATA信息
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
         splits = text_splitter.split_documents(data)
 
@@ -84,29 +101,62 @@ async def get_retriever(file:UploadFile,uploaded_time:date,embedding_id:int,owne
         vectorstore = FAISS.from_documents(documents=splits, 
                                            embedding=LlamaCppEmbeddings(model_path=model_path))
         vectorstore.save_local(vectorstore_path)
+        #construct the qa chain
+      
+
+
     #file_upload_time=time.ctime()
     else:
         filestore_path=main_path+f"/pdf_retriever/{file.filename}"
         loader =  PyPDFLoader(filestore_path)
         data=loader.load()
-        data[0].metadata.update(user_info)
+        #data[0].metadata.update(user_info)
         vectorstore=FAISS.load_local(vectorstore_path,embeddings=LlamaCppEmbeddings(model_path=model_path))
+        #construct the qa chain
+
 
     return  {
                 "file_name": file.filename,
                 "file_size":file.size,#bytes
                 "vector_id":vectorstore.index_to_docstore_id,
                 "vector_path":vectorstore_path,
-                "metadata":data[0].metadata,
-                "file_uploaded_time":uploaded_time,
-                "embedding_id":embedding_id,
-                "owner":owner,
+                #"metadata":data[0].metadata,
+                #"file_uploaded_time":uploaded_time,
+                #"embedding_id":embedding_id,
+                #"owner":owner,
                 #
                 #
                 #file_status
             }
 
-@app.delete("/pdf_retriever/{filename}")
+@app.get("/pdf_retriever/invoke", tags=["语言模型推理接口"])
+async def get_response(filename:str,question:str):
+    filestore_path=main_path+f"/pdf_retriever/{filename}"# path
+    vectorstore_path=main_path+f"/vectorstore/{filename}"#path
+    if os.path.exists(vectorstore_path) and os.path.exists(filestore_path):
+        vectorstore=FAISS.load_local(vectorstore_path,embeddings=LlamaCppEmbeddings(model_path=model_path))
+        #construct the qa chain
+        retriever = vectorstore.as_retriever(
+            search_kwargs={"k": 6}
+        )
+
+        qa_chain = RetrievalQA.from_chain_type(
+            llm=llm, 
+            retriever=retriever,     
+            chain_type_kwargs={
+                "prompt":  PromptTemplate(
+                template=template,
+                input_variables=["context", "question"]),
+            }
+        )
+        return qa_chain.invoke(question)
+    else:
+        return "Please upload the target file before request!"
+
+
+    
+
+@app.delete("/pdf_retriever/delete/{filename}",tags=["删除上传文件以及向量的接口"])
 async def delete_file(filename:str):
     #删除储存的向量数据
     vectorstore_path=main_path+f"/vectorstore/{filename}"#path
