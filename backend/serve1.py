@@ -15,6 +15,8 @@ from langchain.llms import LlamaCpp
 from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
 from langserve import add_routes
+
+import pymysql
 '''
 PYDANTIC_VERSION = metadata.version("pydantic")
 _PYDANTIC_MAJOR_VERSION: int = int(PYDANTIC_VERSION.split(".")[0])
@@ -57,9 +59,29 @@ template="""[INST]
     Question: {question}
     [/INST]
 """
+
+#connect to MySQL
+conn=pymysql.connect(host="127.0.0.1", port=3306, user="dubenhao", password="123456",database="dubenhao",  charset="utf8")
+cursor=conn.cursor()
+
+
+#API
 @app.get("/")
 def home():
     return {"homepage":"hello, this is a chatbot API build with Llama2-chat-7B and Langchain"}
+
+@app.get("/database",tags=["代码待测试"])
+def get_mysql():
+    try:
+        cursor.execute("SELECT question, number_of_question FROM user_table ORDER BY number_of_question DESC;")
+        data=cursor.fetchmany(size=3)
+    except:
+        print("error")
+    finally:
+        cursor.close()
+
+        return data
+
 @app.post("/uploadfile/")
 async def get_upload_file(files: List[UploadFile]):
 
