@@ -1,0 +1,107 @@
+.tpp-toggle {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    border-radius: 50%;
+    background: #00934a;
+    color: #fff;
+    width: 55px;
+    height: 55px;
+    padding: 0;
+    border: 0;
+    z-index: 9999;
+}
+
+.tpp-toggle .dashicons {
+    font-size: 28px;
+    position: relative;
+    left: -5px;
+}
+
+.tpp-chatbox {
+    position: fixed;
+    bottom: 100px;
+    left: 65px;
+    height: 450px;
+    width: 360px;
+    background: #f7f7f7;
+    z-index: 9999;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
+}
+
+.tpp-chat-messages {
+    overflow: auto;
+    height: calc( 100% - 60px );
+    border-radius: 15px;
+    padding: 10px 5px 0 5px;
+}
+
+.tpp-chat-message {
+    border-radius: 15px;
+    background: #fff;
+    padding: 10px;
+    font-size: 0.9em;
+    float: left;
+}
+
+.tpp-chat-message.user {
+    background: #03799a;
+    text-align: right;
+    float: right;
+    color: #fff;
+}
+
+.tpp-chat-input-wrapper {
+    position: relative;
+}
+
+.clear{
+    clear: both;
+    padding-bottom: 8px;
+}
+
+.clear-user{
+    text-align: right;
+}
+
+.chat-timestamp{
+    clear:both;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 12px;
+}
+
+.tpp-chat-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 5px;
+    font-family: sans-serif;
+    height: 50px;
+    border: 1px solid #ccc;
+    resize: none;
+    padding-right: 50px;
+    line-height: 1.2em;
+}
+
+.tpp-send {
+    position: absolute;
+    right: 7px;
+    top: 10px;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.tpp-send:hover{
+    background-color: #bbf0ff;
+}
+
+.tpp-chatbox-header{
+    position: relative;
+    background-color: #0BB7EC;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    vertical-align: middle;
+    color: #fff;
+    font-size: 20px;
+}
