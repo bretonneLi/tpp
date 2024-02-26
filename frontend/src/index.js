@@ -3,13 +3,13 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import Panda from './Panda';
 import reportWebVitals from './reportWebVitals';
-import Chat from './chat';
+import Chatbot from './chatbot';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     {/* <Panda /> */}
-<Chat />    
+<Chatbot />    
   </React.StrictMode>
 );
 

@@ -32,6 +32,10 @@ app.add_middleware(
 async def create_upload_file(file: UploadFile, owner:str=Form(...),uploadedTime:str=Form(...),embId:str=Form(...)):
     return {"file_name": file.filename, "owner": owner, 'embId': embId}
 
+@app.get("/pdf_retriever/invoke", tags=["语言模型推理接口"])
+async def get_response(filename:str,question:str):
+    return question
+
 
 if __name__ == "__main__":
     import uvicorn
