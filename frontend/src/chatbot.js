@@ -53,7 +53,7 @@ function Chatbot(){
             if(response&&response.data){
                 let timestamp = getTimestamp();
                 //render respone to page
-                addMessage('assistant', response.data);
+                addMessage('assistant', response.data.result);
                 // scroll to bottom
                 scrollBottom();
             }
