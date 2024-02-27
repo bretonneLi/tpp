@@ -87,7 +87,7 @@ function Chatbot(){
     return (
         <div className='tpp-chat-area'>
             <button className="tpp-toggle" onClick={taggleChatbox}>
-                <span className="dashicons dashicons-email"></span>
+                <span className="dashicons dashicons-format-chat"></span>
             </button>
             {showChat? (<div className="tpp-chatbox">
                 <div className='tpp-chatbox-header'>
