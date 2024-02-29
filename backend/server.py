@@ -67,12 +67,11 @@ template="""[INST]
 """
 
 #connect to MySQL
-'''
-conn=pymysql.connect(host="127.0.0.1", port=3306, user="dubenhao", password="123456",database="dubenhao",  charset="utf8")
-cursor=conn.cursor()
 
 
-'''
+
+
+
 
 
 #API
@@ -80,17 +79,22 @@ cursor=conn.cursor()
 def home():
     return {"homepage":"hello, this is a chatbot API build with Llama2-chat-7B and Langchain"}
 
-@app.get("/database",tags=["代码待测试"])
+@app.get("/welcome",tags=["欢迎界面，default message"])
+def get_homepage():
+    return "default"
+
+@app.get("/database",tags=["初始三个问题"])
 def get_mysql():
+    conn=pymysql.connect(host="localhost", port=3306, user="test_user", password="123456", database="test_data", charset="utf8")
+    cursor=conn.cursor()
     try:
-        cursor.execute("SELECT question, number_of_question FROM user_table ORDER BY number_of_question DESC;")
+        cursor.execute("SELECT question ,number_of_question FROM test_question ORDER BY number_of_question DESC;")
         data=cursor.fetchmany(size=3)
-    except:
+    except Exception :
         print("error")
     finally:
         cursor.close()
-
-        return data
+    return dict(data)
 
 @app.post("/uploadfile/")
 async def get_upload_file(files: List[UploadFile]):
@@ -119,46 +123,26 @@ async def get_retriever(file:UploadFile):#fileinfo:file_info, ,uploaded_time:dat
         data = await file.read()
         f.write(data)
         f.close()
-        
         filestore_path=main_path+f"/pdf_retriever/{file.filename}"
-
         loader =  PyPDFLoader(filestore_path)
         data=loader.load()
-        #data[0].metadata.update(user_info) #根据上传的客户信息更改METADATA信息
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
         splits = text_splitter.split_documents(data)
-
-        #
-
         vectorstore = FAISS.from_documents(documents=splits, 
                                            embedding=hf)
         vectorstore.save_local(vectorstore_path)
-        #construct the qa chain
-      
-
-
-
     else:
-
         vectorstore=FAISS.load_local(vectorstore_path,embeddings=hf)
-        #construct the qa chain
-
-
     return  {
                 "file_name": file.filename,
                 "file_size":file.size,#bytes
                 "vector_id":vectorstore.index_to_docstore_id,
                 "vector_path":vectorstore_path,
-                #"metadata":data[0].metadata,
-                #"file_uploaded_time":uploaded_time,
-                #"embedding_id":embedding_id,
-                #"owner":owner,
-                #file_status
             }
 
 @app.get("/pdf_retriever/invoke", tags=["语言模型推理接口"])#请求什么时候到达后端
 async def get_response(filename:str,question:str):
-    print("-"*20)
+    print("Request received")
     filestore_path=main_path+f"/pdf_retriever/{filename}"# path
     vectorstore_path=main_path+f"/vectorstore/{filename}"#path
     if os.path.exists(vectorstore_path) and os.path.exists(filestore_path):
@@ -167,7 +151,6 @@ async def get_response(filename:str,question:str):
         retriever = vectorstore.as_retriever(
             search_kwargs={"k": 6}
         )
-
         qa_chain = RetrievalQA.from_chain_type(
             llm=llm, 
             retriever=retriever,     
@@ -180,28 +163,19 @@ async def get_response(filename:str,question:str):
         return qa_chain.invoke(question)
     else:
         return "Please upload the target file before request!"
-
-
-    
-
 @app.delete("/pdf_retriever/delete/{filename}",tags=["删除上传文件以及向量的接口"])
 async def delete_file(filename:str):
     #删除储存的向量数据
     vectorstore_path=main_path+f"/vectorstore/{filename}"#path
-
     if os.path.exists(vectorstore_path):
         vectorstore=FAISS.load_local(vectorstore_path,embeddings=hf)
-
         os.remove(vectorstore_path+("/index.faiss"))
         os.remove(vectorstore_path+("/index.pkl"))
         os.rmdir(vectorstore_path)
     #删除储存的文件
     filestore_path=main_path+f"/pdf_retriever/{filename}"# path
-
     if os.path.exists(filestore_path):
         os.remove(filestore_path)
-    
-
     return {"delete":filename,"vector_id":vectorstore.index_to_docstore_id}
 
 
