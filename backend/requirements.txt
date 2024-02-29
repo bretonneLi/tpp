@@ -1,4 +1,7 @@
-fastapi==0.109.0
-langchain==0.1.4
-langchain_community==0.0.16
-uvicorn==0.27.0
+fastapi==0.110.0
+langchain==0.1.9
+langchain_community==0.0.24
+langserve==0.0.45
+pydantic==1.10.13
+PyMySQL==1.1.0
+uvicorn==0.27.1
