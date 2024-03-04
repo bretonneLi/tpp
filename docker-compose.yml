@@ -1,0 +1,26 @@
+version: '3.1'
+
+services:
+  wordpress:
+      image: wordpress
+      links:
+      - mariadb:mysql
+      environment:
+      - WORDPRESS_DB_PASSWORD=abcd1234
+      - WORDPRESS_DB_USER=root
+      ports:
+      - 80:80
+      volumes:
+      - ./html:/var/www/html
+  mariadb:
+      image: mariadb
+      environment:
+      - MARIADB_ROOT_PASSWORD=abcd1234
+      - MARIADB_DATABASE=wordpress
+      volumes:
+      - ./database:/var/lib/mysql
+  adminer:
+      image: adminer
+      restart: always
+      ports:
+        - 8080:8080
