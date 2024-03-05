@@ -9,6 +9,7 @@
     "@wordpress/components": "^25.15.0",
     "@wordpress/scripts": "^27.0.0",
     "axios": "^1.6.5",
+    "cross-env": "^7.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
@@ -16,8 +17,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "wp-scripts build",
+    "start": "cross-env REACT_APP_ENV='development' react-scripts start",
+    "build": "cross-env REACT_APP_ENV='production' wp-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

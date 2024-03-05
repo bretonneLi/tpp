@@ -18,7 +18,7 @@ export function uploadFile(url, file, recordId){
     
     formData.append('uploadedTime', formattedTime);
     formData.append('embId', recordId);
-    return axios.post('http://localhost:8000'+url, formData, {
+    return axios.post(process.env.REACT_APP_TPP_BACK_BASE+url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data' 
       }
