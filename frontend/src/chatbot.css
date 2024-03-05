@@ -42,6 +42,7 @@
     padding: 10px;
     font-size: 0.9em;
     float: left;
+    margin-top: 8px;
 }
 
 .tpp-chat-message.user {

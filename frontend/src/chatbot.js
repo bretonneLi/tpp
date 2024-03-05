@@ -1,5 +1,5 @@
 import './chatbot.css';
-import {retriver} from './api/chat';
+import {retriver,chatInit} from './api/chat';
 import { useEffect, useState, useRef } from 'react';
 
 function Chatbot(){
@@ -9,12 +9,35 @@ function Chatbot(){
     }
     const [showChat, setShowChat] = useState(false);
     const [messages, setMessages] = useState([
-        {
-            'role': 'assistant',
-            'content': 'Hello, I am your assistant.',
-            'timestamp': 'TPP '+ getTimestamp()
-        }
+        // {
+        //     'role': 'init',
+        //     'content': 'Hello, I am your assistant.',
+        //     'timestamp': 'TPP '+ getTimestamp(),
+        //     'items': [
+        //         'Weclome.',
+        //         'I am TPP Agent and I only answer in English and French',
+        //         'Select a topic in the below list or ask me directly your question.'
+        //     ]
+        // }
     ]);
+
+    useEffect(()=>{
+        initChatbot();
+    }, []);
+
+    async function initChatbot(){
+        chatInit().then((response)=>{
+            console.log(response);
+            if(response&&response.data){
+                let timestamp = getTimestamp();
+                // 单条更新
+                setMessages([...messages, {'role': 'init', 'content':'', 'timestamp':'TPP '+timestamp, 'items': response.data}]);
+            }            
+        }).catch((error)=>{
+            console.log('error initing chatbot: '+ error);
+        });
+    }
+
     const chatMessage = useRef(null); 
     const [currInput, setCurrInput] = useState('');
 
@@ -94,26 +117,40 @@ function Chatbot(){
                     TPP - Virtual Agent
                 </div>
                     <div className="tpp-chat-messages" ref={chatMessage} id='tpp-chat-msg'>
-                        {messages.map((msg, index)=>
-                        msg.role=='calling'?(
-                        <div className='clear' key={'msg-'+index}>
-                            <div className="container">
-                                <div className="dot"></div>
-                                <div className="dot"></div>
-                                <div className="dot"></div>
-                            </div>
-                            <div className='chat-timestamp'>
-                                <small>TPP</small>
-                            </div>
-                        </div>):
-                        (<div className={"clear "+ (msg.role==="user"?"clear-user":"")} key={'msg-'+index}>
-                            <div className={"tpp-chat-message "+ msg.role}>
-                                {msg.content}
-                            </div>
-                            <div className='chat-timestamp'>
-                                <small>{msg.timestamp}</small>
-                            </div>
-                        </div>)
+                        {messages.map((msg, index)=>{
+                            if(msg.role=='calling'){
+                                return ( <div className='clear' key={'msg-'+index}>
+                                <div className="container">
+                                    <div className="dot"></div>
+                                    <div className="dot"></div>
+                                    <div className="dot"></div>
+                                </div>
+                                <div className='chat-timestamp'>
+                                    <small>TPP</small>
+                                </div>
+                            </div>);
+                            }else if(msg.role=='init'){
+                                return (<div className="clear" key={'msg-'+index}>
+                                {msg.items.map((item, index)=>{
+                                    return (<div className="tpp-chat-message" key={'msg-item'+index}>
+                                    {item}
+                                </div>)
+                                })}                            
+                                <div className='chat-timestamp'>
+                                    <small>{msg.timestamp}</small>
+                                </div>
+                            </div>);
+                            }else {
+                                return (<div className={"clear "+ (msg.role==="user"?"clear-user":"")} key={'msg-'+index}>
+                                <div className={"tpp-chat-message "+ msg.role}>
+                                    {msg.content}
+                                </div>
+                                <div className='chat-timestamp'>
+                                    <small>{msg.timestamp}</small>
+                                </div>
+                            </div>);
+                            }
+                        }
                         )}                                           
                     </div>
                     <div className="tpp-chat-input-wrapper">

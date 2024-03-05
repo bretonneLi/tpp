@@ -34,7 +34,11 @@ async def create_upload_file(file: UploadFile, owner:str=Form(...),uploadedTime:
 
 @app.get("/pdf_retriever/invoke", tags=["语言模型推理接口"])
 async def get_response(filename:str,question:str):
-    return question
+    return {"result": question, "query": question}
+
+@app.get("/chat/init", tags=["对话初始加载欢迎语"])
+async def chat_init():
+    return ["Weclome.","I am TPP Agent and I only answer in English and French","Select a topic in the below list or ask me directly your question."]
 
 
 if __name__ == "__main__":
