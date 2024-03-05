@@ -120,7 +120,7 @@ function Chatbot(){
                         {messages.map((msg, index)=>{
                             if(msg.role=='calling'){
                                 return ( <div className='clear' key={'msg-'+index}>
-                                <div className="container">
+                                <div className="chatbot-container">
                                     <div className="dot"></div>
                                     <div className="dot"></div>
                                     <div className="dot"></div>

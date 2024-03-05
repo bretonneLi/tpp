@@ -107,7 +107,7 @@
     font-size: 20px;
 }
 
-.container {
+.chatbox-container {
     /* display: flex; */
     justify-content: center;
     align-items: center;
@@ -125,7 +125,7 @@
     }
   }
 
-  .container {
+  .chatbox-container {
   .dot {
     opacity: 0;
     animation: blink 1s infinite;

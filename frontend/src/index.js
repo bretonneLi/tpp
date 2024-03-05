@@ -4,12 +4,12 @@ import './index.css';
 import Panda from './Panda';
 import reportWebVitals from './reportWebVitals';
 import Chatbot from './chatbot';
-
+// change root to tppchatbot when build chatbot plugin
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     {/* <Panda /> */}
-<Chatbot />    
+    <Chatbot />
   </React.StrictMode>
 );
 
