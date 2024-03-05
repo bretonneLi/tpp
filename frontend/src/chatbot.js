@@ -132,7 +132,7 @@ function Chatbot(){
                             }else if(msg.role=='init'){
                                 return (<div className="clear" key={'msg-'+index}>
                                 {msg.items.map((item, index)=>{
-                                    return (<div className="tpp-chat-message" key={'msg-item'+index}>
+                                    return (<div className="tpp-chat-message clear" key={'msg-item'+index}>
                                     {item}
                                 </div>)
                                 })}                            
