@@ -44,9 +44,11 @@ llm = HuggingFacePipeline(pipeline=pipe)
 #EmbeddingModel
 emb_model_name = "BAAI/bge-base-zh-v1.5"
 emb_model_kwargs = {'device': 'cpu'}
+encode_kwargs = {"normalize_embeddings": True}
 hf = HuggingFaceBgeEmbeddings(
     model_name=emb_model_name,
     model_kwargs=emb_model_kwargs,
+    encode_kwargs=encode_kwargs
 )
 
 # Template
