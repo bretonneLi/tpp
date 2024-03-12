@@ -1,9 +1,9 @@
 from fastapi import APIRouter
-from sql_config import get_connection_sql
+from configs.sql_config import get_connection_sql
 welcome=APIRouter()
 
 
-@welcome.get("/welcome",tags=["欢迎界面，default message"])
+@welcome.get("/",tags=["欢迎界面，default message"])
 def get_homepage():
     return "default"
 

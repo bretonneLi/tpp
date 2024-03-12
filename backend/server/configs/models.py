@@ -36,5 +36,3 @@ def get_HFInstructorEmbedding_model(modelpath:str,emb_model_kwargs = {'device': 
     )
     return hf
 
-if __name__ =="__main__":
-     get_llm_model("meta-llama/Llama-2-7b-chat-hf")

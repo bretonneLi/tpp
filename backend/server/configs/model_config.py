@@ -1,5 +1,5 @@
 import os
-from models import (get_llm_model,
+from configs.models import (get_llm_model,
                             get_HFBgeEmbedding_model,
                             get_HFInstructorEmbedding_model,
                             get_llama_cpp)
@@ -28,6 +28,7 @@ LLM_MODELS = {"chatglm3-6b":get_llm_model(MODEL_PATH["llm_model"]["chatglm3-6b"]
               "Llama.cpp":get_llama_cpp(MODEL_PATH["llm_model"]["Llama.cpp"])
 
             }
+
 
 if __name__=="__main__":
     print(MODEL_PATH["embed_model"]["instructor-large"])
