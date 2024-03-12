@@ -3,9 +3,6 @@ from configs.sql_config import get_connection_sql
 welcome=APIRouter()
 
 
-@welcome.get("/",tags=["欢迎界面，default message"])
-def get_homepage():
-    return "default"
 
 @welcome.get("/database",tags=["初始三个问题"])
 def get_mysql():
