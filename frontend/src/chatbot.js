@@ -24,6 +24,7 @@ function Chatbot(){
 
     useEffect(()=>{
         initChatbot();
+        getLLM();
     }, []);
 
     async function getLLM(){
@@ -81,7 +82,7 @@ function Chatbot(){
         // scroll to bottom
         scrollBottom();
         //call server side to get response from LLM
-        retriver(question).then((response)=>{
+        retriver(question, currentLLM).then((response)=>{
             console.log(response.data);
             if(response&&response.data){
                 let timestamp = getTimestamp();

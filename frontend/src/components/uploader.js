@@ -5,7 +5,7 @@ import '../Panda.css';
 import {uploadFile,addEmbeddingRecord,updateEmbeddingRecord} from '../api/embedding'
 
 function Uploader(props) {
-  const {getRecords} = props;
+  const {getRecords, llm} = props;
   const [resMsg, setResMsg] = useState('uploaded OK.');
     const baseStyle = {
         flex: 1,
@@ -47,7 +47,7 @@ function Uploader(props) {
     }
       
     const uploadEmbedding = (file, embId) => {
-      let request = uploadFile("/mockuploadfile/", file, embId);
+      let request = uploadFile("/pdf_retriever/", file, embId, llm);
       request.then((response)=>{
         // file sent successfully
         console.log(response.status);

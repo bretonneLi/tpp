@@ -3,7 +3,7 @@ import Request from "./request";
 import {REACT_APP_TPP_BACK_BASE} from "../global-config";
 
 // upload embedding file
-export function uploadFile(url, file, recordId){
+export function uploadFile(url, file, recordId, llm){
     let formData = new FormData(); 
     formData.append('file', file); 
     formData.append('owner', 'admin');
@@ -19,6 +19,7 @@ export function uploadFile(url, file, recordId){
     
     formData.append('uploadedTime', formattedTime);
     formData.append('embId', recordId);
+    formData.append('modelname', llm);
     return axios.post(REACT_APP_TPP_BACK_BASE+url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data' 
@@ -77,4 +78,13 @@ export function addLLMSetting(data){
 // 获取LLM list
 export function queryLlmList(){
   return axios.get(REACT_APP_TPP_BACK_BASE+ `getconfigs/llmnames`);
+}
+
+// remote vectorstored file
+export function removeFile(fileName){
+  return axios.delete(REACT_APP_TPP_BACK_BASE+'pdf_retriever/delete/', {	
+    params: {	// 请求参数拼接在url上
+      filename: fileName
+    }
+  });
 }

@@ -74,6 +74,7 @@ function Panda(){
             console.log(error);
         });
     }
+
     return (
         <div className="panda-container">
             <div className='panda-adding'>
@@ -91,7 +92,7 @@ function Panda(){
             </div>
            {showUploader? (<div className="panda-uploader">
                 <button className="panda-close-btn" onClick={hideUpload}>X</button>
-                <Uploader getRecords={getRecords}/>
+                <Uploader getRecords={getRecords} llm={currentLLM}/>
             </div>): null
             }
             <div className='panda-list'>

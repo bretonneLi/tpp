@@ -1,5 +1,5 @@
 import './pandaTable.css';
-import {updateEmbeddingRecord} from '../api/embedding';
+import {updateEmbeddingRecord, removeFile} from '../api/embedding';
 
 function PandaTable(props) {
     const items = props.items;
@@ -7,7 +7,6 @@ function PandaTable(props) {
     // console.log(items);
 
     const deleteEmbedding =(item)=>{
-        // TODO
         console.log('start to remove emb_id: '+item.emb_id);
         let params ={
             'embId': item.emb_id,
@@ -18,8 +17,9 @@ function PandaTable(props) {
             updateEmbeddingRecord(params).then((response)=>{
                 console.log('removed '+response.data);
                 // request backend to remove datas in Vector databse
-                // TODO
-    
+                removeFile(item.file_name).then((response)=>{
+                    console.log('removed vectorstore'+ response.data);
+                })
                 // refresh list after remove is done
                 getRecords();
             }).catch((error)=>{
