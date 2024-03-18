@@ -1,7 +1,8 @@
 import aioxs from 'axios';
+import {REACT_APP_WP_API_BASE} from "../global-config";
 
 const Request = aioxs.create({
-    baseURL: process.env.REACT_APP_WP_API_BASE, //"http://localhost:8089/wordpress/?rest_route=",
+    baseURL: REACT_APP_WP_API_BASE, //"http://localhost:8089/wordpress/?rest_route=",
     timeout: 5000
 });
 

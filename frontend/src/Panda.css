@@ -4,6 +4,32 @@
     min-height: 100vh;
 }
 
+.panda-adding{
+    position: relative;
+}
+
+.panda-setting{
+    position: absolute;
+    right: 0;
+    top: 35px;
+    vertical-align: middle;
+}
+
+.panda-setting .panda-button{
+    margin-left: 10px;
+    margin-right: 5px;
+}
+
+.panda-adding select{    
+    width: 120px;
+    height: 30px;
+    text-align: center;
+}
+
+.panda-llm{
+    color: #2271b1;
+}
+
 .panda-container h1{
     display: inline-block;
     margin-right: 5px;

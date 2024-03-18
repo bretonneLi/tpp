@@ -1,5 +1,5 @@
 import './chatbot.css';
-import {retriver,chatInit} from './api/chat';
+import {retriver,chatInit,getCurrentLLM} from './api/chat';
 import { useEffect, useState, useRef } from 'react';
 
 function Chatbot(){
@@ -7,6 +7,7 @@ function Chatbot(){
         let time = new Date();
         return time.getHours().toString().padStart(2, '0')+':'+time.getMinutes().toString().padStart(2, '0')+':'+time.getSeconds().toString().padStart(2, '0');
     }
+    const [currentLLM, setCurrentLLM] = useState('');
     const [showChat, setShowChat] = useState(false);
     const [messages, setMessages] = useState([
         // {
@@ -24,6 +25,15 @@ function Chatbot(){
     useEffect(()=>{
         initChatbot();
     }, []);
+
+    async function getLLM(){
+        getCurrentLLM().then((response)=>{
+            // console.log(response);
+            setCurrentLLM(response.data.llm_name);
+        }).catch((error)=>{
+            console.log(error);
+        });
+    }
 
     async function initChatbot(){
         chatInit().then((response)=>{

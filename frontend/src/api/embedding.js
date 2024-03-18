@@ -1,5 +1,6 @@
 import axios from "axios";
 import Request from "./request";
+import {REACT_APP_TPP_BACK_BASE} from "../global-config";
 
 // upload embedding file
 export function uploadFile(url, file, recordId){
@@ -18,7 +19,7 @@ export function uploadFile(url, file, recordId){
     
     formData.append('uploadedTime', formattedTime);
     formData.append('embId', recordId);
-    return axios.post(process.env.REACT_APP_TPP_BACK_BASE+url, formData, {
+    return axios.post(REACT_APP_TPP_BACK_BASE+url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data' 
       }
@@ -52,4 +53,28 @@ export function getEmbeddingRecords(){
       'owner': 'admin'
     }
   })
+}
+
+// add LLM setting record
+export function addLLMSetting(data){
+  return Request({
+    url:"/llm/v1/set",
+    method: 'POST',
+    data: data
+  })
+}
+
+ // load current LLM set
+ export function getCurrentLLM(){
+  return Request({
+    url:"/llm/v1/target",
+    method: 'GET',
+    params: {
+    }
+  })
+}
+
+// 获取LLM list
+export function queryLlmList(){
+  return axios.get(REACT_APP_TPP_BACK_BASE+ `getconfigs/llmnames`);
 }

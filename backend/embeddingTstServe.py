@@ -40,6 +40,9 @@ async def get_response(filename:str,question:str):
 async def chat_init():
     return ["Weclome.","I am TPP Agent and I only answer in English and French","Select a topic in the below list or ask me directly your question."]
 
+@app.get("/getconfigs/llmnames", tags=["获取模型list"])
+async def llm_list():
+    return ['llma2', 'chatglm3-6b', 'chatGPT4']
 
 if __name__ == "__main__":
     import uvicorn

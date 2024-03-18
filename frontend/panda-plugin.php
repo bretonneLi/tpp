@@ -63,10 +63,22 @@ function register_api_route(){
         'callback' => 'update_embedding_records',
     ));
 
-    // get file uploaded list 
+    // get file uploaded list
     register_rest_route('embedding/v1', '/list', array(
         'methods' => 'GET',
         'callback' => 'get_embedding_records',
+    ));
+
+    // set llm setting record to wp table
+    register_rest_route('llm/v1', '/set', array(
+        'methods' => 'POST',
+        'callback' => 'setLLM',
+    ));
+
+     // get llm support list
+     register_rest_route('llm/v1', '/target', array(
+        'methods' => 'GET',
+        'callback' => 'getCurrLLM',
     ));
 }
 
@@ -103,10 +115,9 @@ function add_embedding_record(WP_REST_Request $request) {
           "owner" => $username,
           "file_status" => $fileStatus,
           ));
-      if($insert) {        
+      if($insert) {
         // new id generated after inserted to table
-        $newId = $wpdb->insert_id;
-        return $newId;
+        return $wpdb->insert_id;
       } else {
         return 0;
       }
@@ -172,4 +183,52 @@ function get_embedding_records(WP_REST_Request $request){
     }
     // return empty array
     return [];
+}
+
+/**
+ * set current LLM name to data table
+ */
+function setLLM(WP_REST_Request $request){
+     $userInfo = do_stuff();
+     // login username
+     // $username =  $current_user->data->user_login;
+     // for test only
+     $username = 'admin';
+ 
+     global $wpdb;
+     $table_name = $wpdb->prefix . 'llm_setting';
+     $parameters = json_decode($request->get_body());
+     $llmName = $parameters->llmName;
+ 
+     if($llmName) {
+       $insert = $wpdb->insert($table_name, array(
+           "llm_name" => $llmName ,
+           "created_by" => $username
+           ));
+       if($insert) {
+         // new id generated after inserted to table
+         return $wpdb->insert_id;
+       } else {
+         return 0;
+       }
+     }
+     return -1;
+}
+
+/**
+ * get current LLM set already
+ */
+function getCurrLLM(WP_REST_Request $request){
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'llm_setting';
+  
+    $results = $wpdb->get_results(
+        "select llm_name from $table_name order by id desc limit 1;"
+    );
+
+    if(empty($results)>0){
+        return $results[0];
+    }
+    // return empty
+    return "";
 }
