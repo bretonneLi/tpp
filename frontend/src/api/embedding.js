@@ -3,7 +3,7 @@ import Request from "./request";
 import {REACT_APP_TPP_BACK_BASE} from "../global-config";
 
 // upload embedding file
-export function uploadFile(url, file, recordId, llm){
+export function uploadFile(url, file, recordId){
     let formData = new FormData(); 
     formData.append('file', file); 
     formData.append('owner', 'admin');
@@ -18,8 +18,7 @@ export function uploadFile(url, file, recordId, llm){
     + currentTime.getSeconds().toString().padStart(2, '0');
     
     formData.append('uploadedTime', formattedTime);
-    formData.append('embId', recordId);
-    formData.append('modelname', llm);
+    formData.append('embId', recordId);    
     return axios.post(REACT_APP_TPP_BACK_BASE+url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data' 
