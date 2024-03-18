@@ -5,12 +5,12 @@ import {REACT_APP_TPP_BACK_BASE} from "../global-config";
 export function retriver(question, modelname){
     let filename='tingyimiao.pdf';
     // 使用模板字符串将参数拼接在 URL 上
-    return axios.get(REACT_APP_TPP_BACK_BASE+`pdf_retriever/invoke?question=${question}&filename=${filename}&modelname=${modelname}`);
+    return axios.get(REACT_APP_TPP_BACK_BASE+`qachain/pdf_retriever/invoke?question=${question}&filename=${filename}&modelname=${modelname}`);
 }
 
 // 机器人初始加载欢迎语
 export function chatInit(){
-    return axios.get(REACT_APP_TPP_BACK_BASE+ `database`);
+    return axios.get(REACT_APP_TPP_BACK_BASE+ `welcome/database`);
 }
 
  // get current LLM

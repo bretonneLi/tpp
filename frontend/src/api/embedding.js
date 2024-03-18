@@ -82,7 +82,7 @@ export function queryLlmList(){
 
 // remote vectorstored file
 export function removeFile(fileName){
-  return axios.delete(REACT_APP_TPP_BACK_BASE+'pdf_retriever/delete/', {	
+  return axios.delete(REACT_APP_TPP_BACK_BASE+'embedding/pdf_retriever/delete/', {	
     params: {	// 请求参数拼接在url上
       filename: fileName
     }
