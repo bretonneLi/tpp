@@ -47,7 +47,7 @@ function Uploader(props) {
     }
       
     const uploadEmbedding = (file, embId) => {
-      let request = uploadFile("/pdf_retriever/", file, embId, llm);
+      let request = uploadFile("embedding/pdf_retriever/", file, embId, llm);
       request.then((response)=>{
         // file sent successfully
         console.log(response.status);
