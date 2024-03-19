@@ -28,7 +28,7 @@ app.add_middleware(
 )
 
 # emb_id, owner, uploaded_time
-@app.post("/mockuploadfile/")
+@app.post("/embedding/pdf_retriever/")
 async def create_upload_file(file: UploadFile, owner:str=Form(...),uploadedTime:str=Form(...),embId:str=Form(...)):
     return {"file_name": file.filename, "owner": owner, 'embId': embId}
 
@@ -36,7 +36,7 @@ async def create_upload_file(file: UploadFile, owner:str=Form(...),uploadedTime:
 async def get_response(filename:str,question:str):
     return {"result": question, "query": question}
 
-@app.get("/chat/init", tags=["对话初始加载欢迎语"])
+@app.get("/welcome/database", tags=["对话初始加载欢迎语"])
 async def chat_init():
     return ["Weclome.","I am TPP Agent and I only answer in English and French","Select a topic in the below list or ask me directly your question."]
 
