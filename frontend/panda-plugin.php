@@ -221,13 +221,12 @@ function setLLM(WP_REST_Request $request){
 function getCurrLLM(WP_REST_Request $request){
     global $wpdb;
     $table_name = $wpdb->prefix . 'llm_setting';
-  
-    $results = $wpdb->get_results(
+    $results = $wpdb->get_row(
         "select llm_name from $table_name order by id desc limit 1;"
     );
 
-    if(empty($results)>0){
-        return $results[0];
+    if($results){
+        return $results->llm_name;
     }
     // return empty
     return "";

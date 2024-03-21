@@ -30,7 +30,7 @@ function Chatbot(){
     async function getLLM(){
         getCurrentLLM().then((response)=>{
             // console.log(response);
-            setCurrentLLM(response.data.llm_name);
+            setCurrentLLM(response.data);
         }).catch((error)=>{
             console.log(error);
         });
@@ -81,8 +81,9 @@ function Chatbot(){
         setMessages([...messages, {'role': 'calling', 'content':'', 'timestamp': ''}]);
         // scroll to bottom
         scrollBottom();
+        let llmModel = currentLLM;
         //call server side to get response from LLM
-        retriver(question, currentLLM).then((response)=>{
+        retriver(question, llmModel).then((response)=>{
             console.log(response.data);
             if(response&&response.data){
                 let timestamp = getTimestamp();

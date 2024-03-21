@@ -8,8 +8,8 @@ import Chatbot from './chatbot';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    {/* <Panda /> */}
-    <Chatbot />
+    <Panda />
+    {/* <Chatbot /> */}
   </React.StrictMode>
 );
 

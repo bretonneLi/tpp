@@ -69,7 +69,7 @@ function Panda(){
     async function getLLM(){
         getCurrentLLM().then((response)=>{
             // console.log(response);
-            setCurrentLLM(response.data.llm_name);
+            setCurrentLLM(response.data);
         }).catch((error)=>{
             console.log(error);
         });
